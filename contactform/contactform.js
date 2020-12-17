@@ -89,29 +89,39 @@ jQuery(document).ready(function($) {
       }
     });
     if (ferror) return false;
-    else var str = $(this).serialize();
-    var action = $(this).attr('action');
-    if( ! action ) {
-      action = 'contactform/contactform.php';
-    }
-    $.ajax({
-      type: "POST",
-      url: action,
-      data: str,
-      success: function(msg) {
-        // alert(msg);
-        if (msg == 'OK') {
-          $("#sendmessage").addClass("show");
-          $("#errormessage").removeClass("show");
-          $('.contactForm').find("input, textarea").val("");
-        } else {
+
+      try {
+          Email.send({
+              SecureToken : "4a3bcb59-26d2-452d-bac5-5e57b4f65210",
+              To : 'info@nexus-it.tech',
+              From : 'vooc.nexusit@gmail.com',
+              FromName : document.getElementById("name").value,
+              ReplyAddress: document.getElementById("email").value,
+              Subject : document.getElementById("subject").value,
+              Body : document.getElementById("message").value
+          }).then(
+              message => {
+                  if (message != 'OK') {
+                      $("#sendmessage").removeClass("show");
+                      $("#errormessage").addClass("show");
+                      $('#errormessage').html(message);
+                  } else {
+                      $("#sendmessage").addClass("show");
+                      $("#errormessage").removeClass("show");
+                      $('.contactForm').find("input, textarea").val("");
+                      setTimeout(function() {
+                          $("#sendmessage").removeClass("show");
+                      }, 5000);
+
+                  }
+              }
+          );
+      } catch (e) {
           $("#sendmessage").removeClass("show");
           $("#errormessage").addClass("show");
-          $('#errormessage').html(msg);
-        }
-
+          $('#errormessage').html(message);
+          console.error(e);
       }
-    });
     return false;
   });
 
